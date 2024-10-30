@@ -7,11 +7,6 @@ use App\Models\ArticuloServicio;
 
 class ArticuloServicioController extends Controller
 {
-    // Constructor para agregar el middleware de autenticación
-    public function __construct()
-    {
-        $this->middleware('auth'); // Método correcto en Laravel
-    }
 
     // Método para guardar un nuevo artículo
     public function store(Request $request)
@@ -35,7 +30,7 @@ class ArticuloServicioController extends Controller
         $articulo->file = $request->input('file');
         $articulo->service_url = $request->input('service_url');
         $articulo->publish_date = $request->input('publish_date');
-
+            
         // Obtener el nombre del usuario autenticado
         $articulo->author = auth()->user()->name;  // Método válido de Laravel
 
