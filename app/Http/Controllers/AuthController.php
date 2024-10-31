@@ -2,76 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Exception;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Http\Requests\Auth\Login;
+use Illuminate\Support\Facades\Log;
+use App\Services\Tokens\TokenFactory;
+use App\Services\Tokens\TokenService;
+use App\Exceptions\Services\Tokens;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    // Registrar un nuevo usuario
-    public function register(Request $request)
+    public function login(Login $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-            'entidad_id' => 'required|integer'
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'entidad_id' => $request->entidad_id
-        ]);
-
-        return response()->json(['message' => 'Usuario registrado exitosamente', 'user' => $user]);
-    }
-
-    // Autenticar usuario y generar tokens
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-
-        try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Credenciales inválidas'], 401);
+        try{
+            $user = User::verifyCredentials($request->email, $request->password);
+            if(!is_object($user)){
+                switch($user){
+                    case 1:
+                        $message = 'Usuario inactivo';
+                    break;
+                    case 2:
+                        $message = 'Contraseña incorrecta';
+                    break;
+                }
+                return response()->json([
+                    'message' => $message
+                ], 401);
             }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'No se pudo crear el token'], 500);
-        }
-
-        $refreshToken = JWTAuth::claims(['exp' => now()->addMinutes(config('jwt.refresh_ttl'))])->fromUser(Auth::user());
-
-        return response()->json([
-            'access_token' => $token,
-            'refresh_token' => $refreshToken,
-            'expires_in' => JWTAuth::factory()->getTTL() * 60
-        ]);
-    }
-
-    // Refrescar token de operación
-    public function refresh()
-    {
-        try {
-            $newToken = JWTAuth::refresh(JWTAuth::getToken());
-
+            $user->tokens()->delete();
+            $tokenOperation = TokenFactory::create('operation');
+            $tokenUpdate = TokenFactory::create('update');
             return response()->json([
-                'access_token' => $newToken,
-                'expires_in' => JWTAuth::factory()->getTTL() * 60
-            ]);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Token de refresco inválido'], 401);
+                'items' => $user,
+                'tokenOperation' => $tokenOperation->generate($user),
+                'tokenUpdate' => $tokenUpdate->generate($user)
+            ], 200);
+        }catch(Exception $e){
+            Log::error(get_class($this) . 'method : ' .  __FUNCTION__ . ': ' . $e->getMessage());
+            return response()->json([
+                'message'=>'Estamos experimentando problemas temporales',
+            ], 500);
         }
     }
 
-    // Cerrar sesión e invalidar tokens
-    public function logout()
+    public function refreshTokens(Request $request)
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        try{
+            $user = $request->user();
+            list($tokenOperation, $tokenUpdate) = TokenService::refreshTokens($user);
+            return response()->json([
+                'tokenOperation' => $tokenOperation,
+                'tokenUpdate' => $tokenUpdate
+            ], 200);
+        }catch(Tokens $e){
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 401);
+        }catch(Exception $e){
+            Log::error(get_class($this) . 'method : ' .  __FUNCTION__ . ': ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Estamos experimentando problemas'
+            ], 500);
+        }
+    }
 
-        return response()->json(['message' => 'Sesión cerrada exitosamente']);
+    public function logout(Request $request)
+    {
+        try{
+            $user = $request->user();
+            $user->tokens()->delete();
+            return response()->json([
+                'message' => 'clario'
+            ], 200);
+        }catch(Exception $e){
+            Log::error(get_class($this) . 'method :' . __FUNCTION__ . ':' . $e->getMessage());
+            return response()->json([
+                'message' => 'Estamos experimentando problemas temporales'
+            ], 500);
+        }
     }
 }
