@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+
+>>>>>>> backup
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -13,4 +17,8 @@ class Kernel extends HttpKernel
             \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
         ],
     ];
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> backup

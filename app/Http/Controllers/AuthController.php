@@ -43,7 +43,7 @@ class AuthController extends Controller
             return response()->json([
                 'message'=>'Estamos experimentando problemas temporales',
             ], 500);
-        }   
+        }
     }
 
     public function refreshTokens(Request $request)

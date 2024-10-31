@@ -9,4 +9,8 @@ abstract class Controller
     {
         Log::error(get_class($this) . ', method: ' . $function . ' error: ' . $e->getMessage);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> backup

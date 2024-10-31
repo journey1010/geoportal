@@ -19,11 +19,19 @@ class Template extends FormRequest
     }
 
     protected function failedValidation(Validator $validator)
+<<<<<<< HEAD
     { 
         $jsonResponse  = new JsonResponse([
             'message' => messageValidation($validator)
         ], 422);
         
+=======
+    {
+        $jsonResponse  = new JsonResponse([
+            'message' => messageValidation($validator)
+        ], 422);
+
+>>>>>>> backup
         throw new HttpResponseException($jsonResponse);
     }
     /**
@@ -35,4 +43,8 @@ class Template extends FormRequest
     {
         return [];
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> backup

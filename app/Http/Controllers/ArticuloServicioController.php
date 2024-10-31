@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArticuloServicio;
+
 use App\Http\Requests\ArticuloServicio\Store;
+
+
 use App\Models\User;
 
 class ArticuloServicioController extends Controller
@@ -11,6 +14,7 @@ class ArticuloServicioController extends Controller
 
     // Método para guardar un nuevo artículo
     public function store(Store $request)
+
     {
         try{
             // Crear un nuevo registro en la tabla 'articulos_servicios'
@@ -22,8 +26,8 @@ class ArticuloServicioController extends Controller
             $articulo->file = $request->input('file');
             $articulo->service_url = $request->input('service_url');
             $articulo->publish_date = $request->input('publish_date');
-            
-                
+
+
             // Obtener el nombre del usuario autenticado
             $articulo->author = $request->name;  // Método válido de Laravel
 
