@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('articulos_servicios', function (Blueprint $table) {
             $table->id();
-            $table->string('item_name', 255) ->change();
+            $table->string('item_name', 255)->change();
             $table->text('description');  // TEXT
-            $table->enum('content_type', ['object', 'service']);  
-            $table->string('file', 500) ->change();
-            $table->string('service_url', 500) ->change(); 
-            $table->date('publish_date'); 
-            $table->string('author', 100);  
+            $table->enum('content_type', ['object', 'service']);
+            $table->string('file', 500)->change();
+            $table->string('service_url', 500)->change();
+            $table->date('publish_date');
+            $table->string('author', 100);
             $table->integer('status')->default(1);
-            
+
             // Campos que asocian el registro con el usuario y la entidad
             $table->unsignedBigInteger('user_id');  // Relación con el usuario que sube el contenido
             $table->unsignedBigInteger('entidad_id');  // Relación con la entidad que guarda el registro
@@ -42,5 +42,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('articulos_servicios');
     }
-    
 };
