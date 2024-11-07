@@ -12,5 +12,5 @@ Route::prefix('/v1/')->group(function () {
 });
 
 Route::prefix('v1')->group(function () {
-    Route::post('articulos/servicio', [ArticuloServicioController::class, 'store'])->middleware('auth:sanctum', 'abilities:operation-api-token,manager');
+    Route::post('articulo', [ArticuloServicioController::class, 'store'])->middleware('auth:sanctum');
 });

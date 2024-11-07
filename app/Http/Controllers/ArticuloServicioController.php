@@ -3,22 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArticuloServicio;
-
-use App\Http\Requests\ArticuloServicio\Store;
-
-
-use App\Models\User;
+use Illuminate\Http\Request;
 
 class ArticuloServicioController extends Controller
 {
-
-    // Método para guardar un nuevo artículo
-    public function store(Store $request)
-
+    public function store(Request $request)
     {
-        try{
-            // Crear un nuevo registro en la tabla 'articulos_servicios'
+        $request->validate([
+            'item_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'content_type' => 'nullable|string',
+            'file' => 'nullable|string',
+            'service_url' => 'nullable|url',
+            'publish_date' => 'nullable|date',
+            'entidad_id' => 'nullable|integer'
+        ]);
 
+        try {
             $articulo = new ArticuloServicio();
             $articulo->item_name = $request->input('item_name');
             $articulo->description = $request->input('description');
@@ -26,25 +27,17 @@ class ArticuloServicioController extends Controller
             $articulo->file = $request->input('file');
             $articulo->service_url = $request->input('service_url');
             $articulo->publish_date = $request->input('publish_date');
-
-
-            // Obtener el nombre del usuario autenticado
-            $articulo->author = $request->name;  // Método válido de Laravel
-
-            // Obtener el ID del usuario autenticado
-            $articulo->user_id = request()->user();  // Método válido de Laravel
-
-            // Guardar el ID de la entidad seleccionada
+            $articulo->author = $request->user()->name;  // Nombre del usuario autenticado
+            $articulo->user_id = $request->user()->id;   // ID del usuario autenticado
             $articulo->entidad_id = $request->input('entidad_id');
 
-            // Guardar el artículo en la base de datos
             $articulo->save();
 
             return response()->json([
-                'message' => 'Artículo guardado con éxito.'
-            ], 200);
-        }catch(\Exception $e){
-            $this->LogError($e, __FUNCTION__);
+                'message' => 'Artículo guardado con éxito.',
+                'data' => $articulo
+            ], 201);
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Estamos experimentando problemas temporales'
             ], 500);
