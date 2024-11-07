@@ -18,7 +18,7 @@ class Login extends Template
             'password' => 'required|string'
         ];
     }
-    
+
     public function messages(): array
     {
         return [
@@ -27,5 +27,5 @@ class Login extends Template
             'email.email' => 'Correo electronico no valido',
             'email.exists' => 'No existe este usuario'
         ];
-    }   
+    }
 }

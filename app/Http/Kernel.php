@@ -13,4 +13,5 @@ class Kernel extends HttpKernel
             \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
         ],
     ];
+
 }
