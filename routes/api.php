@@ -11,4 +11,7 @@ Route::prefix('/v1/')->group(function () {
     Route::post('refresh-token', [AuthController::class, 'refreshTokens'])->middleware('auth:sanctum', 'abilities:refresh-access-token');
     // Ruta para guardar artículos
     Route::post('articulos', [ArticuloController::class, 'store']);
+
+    Route::put('articulos/{id}/revisar', [ArticuloController::class, 'revisar']);
+    //->middleware('auth:sanctum');
 });

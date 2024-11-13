@@ -18,7 +18,7 @@ class CreateArticulosTable extends Migration
             $table->enum('tipo_contenido', ['object', 'service']); // Tipo de contenido
             $table->date('fecha_publicacion'); // Fecha de publicación
             $table->string('autor', 100); // Autor
-            $table->boolean('estado')->default(1); // Estado (activo/inactivo)
+            $table->enum('estado', ['pendiente', 'aprobado', 'rechazado'])->default('pendiente'); // Estados posibles
             $table->unsignedBigInteger('user_id'); // Relación con usuarios
             $table->unsignedBigInteger('entidad_id'); // Relación con entidades
             $table->timestamps(); // created_at y updated_at

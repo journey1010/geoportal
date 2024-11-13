@@ -12,6 +12,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    //public $timestamps = false; // Deshabilitar timestamps
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'entidad_id', // Agrega 'entidad_id' para asociar el usuario con una entidad
+        'status', // Agregar status aquí
     ];
 
     /**
@@ -56,15 +59,23 @@ class User extends Authenticatable
      *  VerifyStatus of user
      * @return \App\Models\User if the credententials are validate or int (1, user disabled), (2, password wrong)
      */
+
     public static function verifyCredentials(string $email, string $password): \App\Models\User|int
     {
         $user = self::where('email', $email)->first();
+
+        if (!$user) {
+            return 3; // Usuario no encontrado
+        }
+
         if ($user->status == 0) {
-            return 1;
+            return 1; // Usuario deshabilitado
         }
+
         if (!Hash::check($password, $user->password)) {
-            return 2;
+            return 2; // Contraseña incorrecta
         }
-        return $user;
+
+        return $user; // Usuario válido
     }
 }
