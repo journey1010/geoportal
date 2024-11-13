@@ -1,7 +1,8 @@
 <?php 
 
+namespace App\Services;
+
 use Illuminate\Validation\Validator; 
-use Illuminate\Support\Facades\Log;
 
 function messageValidation(Validator $validator): string 
 {
