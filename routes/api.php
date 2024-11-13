@@ -12,6 +12,7 @@ Route::prefix('/v1/')->group(function () {
     // Ruta para guardar artículos
     Route::post('articulos', [ArticuloController::class, 'store']);
 
-    Route::put('articulos/{id}/revisar', [ArticuloController::class, 'revisar']);
-    //->middleware('auth:sanctum');
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::put('articulos/{id}/revisar', [ArticuloController::class, 'revisar']);
+    });
 });

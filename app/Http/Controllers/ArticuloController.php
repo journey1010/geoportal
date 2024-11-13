@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Articulo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ArticuloController extends Controller
 {
@@ -36,35 +38,40 @@ class ArticuloController extends Controller
 
     public function revisar(Request $request, $id)
     {
-        // Buscamos el artículo por su ID
+        // Verificar si el usuario está autenticado
+        $user = Auth::user();
+
+        // Si el usuario no es admin, denegar acceso
+        if ($user->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden realizar esta acción.'
+            ], 403);
+        }
+
+        // Continúa con la lógica de revisión del artículo
         $articulo = Articulo::findOrFail($id);
 
-        // Validamos que el administrador envíe el estado y, si es rechazado, el motivo
         $request->validate([
-            'estado' => 'required|in:aprobado,rechazado', // Solo se acepta "aprobado" o "rechazado"
-            'motivo_rechazo' => 'nullable|string|max:500', // Motivo del rechazo (opcional)
+            'estado' => 'required|in:aprobado,rechazado',
+            'motivo_rechazo' => 'nullable|string|max:500',
         ]);
 
-        // Actualizamos el estado del artículo
         $articulo->estado = $request->estado;
 
-        // Si el estado es rechazado, guardamos el motivo
         if ($request->estado === 'rechazado') {
             $articulo->motivo_rechazo = $request->motivo_rechazo;
         } else {
-            $articulo->motivo_rechazo = null; // Si es aprobado, limpiamos el motivo
+            $articulo->motivo_rechazo = null;
         }
 
-        // Guardamos los cambios en la base de datos
         $articulo->save();
 
-        // Respondemos con un mensaje de éxito
         return response()->json([
             'success' => true,
             'message' => $request->estado === 'aprobado'
                 ? 'Artículo aprobado exitosamente.'
                 : 'Artículo rechazado.',
-            'data' => $articulo, // Retornamos los datos actualizados del artículo
+            'data' => $articulo,
         ]);
     }
 }

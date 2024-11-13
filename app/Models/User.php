@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'entidad_id', // Agrega 'entidad_id' para asociar el usuario con una entidad
         'status', // Agregar status aquí
+        'role',
     ];
 
     /**
