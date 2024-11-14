@@ -4,39 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Articulo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ArticuloServicio\Revisar;
+use Exception;
 
 class ArticuloController extends Controller
 {
-    public function revisar(Request $request, $id)
+    public function revisar(Revisar $request)
     {
-        // Verificar si el usuario tiene rol de administrador
-        $user = Auth::user();
-        if ($user->role !== 'admin') {
-            return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden realizar esta acción.'
-            ], 403);
+        try{
+            // Buscar el artículo
+            $articulo = Articulo::findOrFail($request->id);
+            // Actualizar estado del artículo
+            $articulo->estado = $request->estado;
+            $articulo->motivo_rechazo = $request->estado == 2 ? $request->motivo_rechazo : null;
+            $articulo->save();
+            return response()->json(['message' => 'Actualizado'], 200);
+        }catch(Exception $e){
+            $this->LogError($e, __FUNCTION__);
+            return $this->defaultResponse($e);
         }
-
-        // Buscar el artículo
-        $articulo = Articulo::findOrFail($id);
-
-        // Validar los datos del request
-        $request->validate([
-            'estado' => 'required|in:1,2', // 1: Aprobado, 2: Rechazado
-            'motivo_rechazo' => 'nullable|string|max:500',
-        ]);
-
-        // Actualizar estado del artículo
-        $articulo->estado = $request->estado;
-
-        if ($request->estado == 2) { // Si es rechazado
-            $articulo->motivo_rechazo = $request->motivo_rechazo;
-        } else { // Si es aprobado
-            $articulo->motivo_rechazo = null;
-        }
-
-        $articulo->save();
     }
 
     public function store(Request $request)

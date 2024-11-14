@@ -21,6 +21,10 @@ class RoleMiddleware
                 'message' => 'Acceso denegado. No tienes los permisos necesarios.',
             ], 403);
         }
+        
+        $request->merge([
+            'userId' => $user->id
+        ]);
 
         return $next($request);
     }
