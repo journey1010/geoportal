@@ -16,9 +16,8 @@ class CreateArticulosTable extends Migration
             $table->string('nombre_item', 255); // Nombre del artículo
             $table->text('descripcion'); // Descripción
             $table->enum('tipo_contenido', ['object', 'service']); // Tipo de contenido
-            $table->date('fecha_publicacion'); // Fecha de publicación
             $table->string('autor', 100); // Autor
-            $table->enum('estado', ['pendiente', 'aprobado', 'rechazado'])->default('pendiente'); // Estados posibles
+            $table->unsignedTinyInteger('estado')->default(0); // Estados posibles 0: Pendiente, 1: Aprobado, 2: Rechazado
             $table->unsignedBigInteger('user_id'); // Relación con usuarios
             $table->unsignedBigInteger('entidad_id'); // Relación con entidades
             $table->timestamps(); // created_at y updated_at
